@@ -48,6 +48,7 @@ Built for humans, not terminals. 😎
 
 ## 📸 Screenshot
 
+<img width="1365" height="732" alt="Screenshot_1" src="https://github.com/user-attachments/assets/1a6d2504-02bc-42d2-9ff5-ed4c24450d17" />
 
 
 ---
