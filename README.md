@@ -50,11 +50,6 @@ Built for humans, not terminals. 😎
 
 ---
 
-## 📸 Screenshot
-
-> <img width="1365" height="729" alt="Screenshot_1" src="https://github.com/user-attachments/assets/d1a17a78-a505-4fcb-a566-3670e65951d8" />
-
-
 ---
 
 ## 🚀 Getting Started
@@ -216,3 +211,6 @@ MIT — do what you want, just don’t blame me if you yeet the wrong folder in 
 
 Crafted with care for clean file workflows.
 If you find this useful, a ⭐ on GitHub makes my day!
+
+<img width="1365" height="729" alt="Screenshot_1" src="https://github.com/user-attachments/assets/3281e8a8-a7ac-4e9a-86fa-c4b18e9794f9" />
+
