@@ -1,74 +1,71 @@
-# Python-GUI-Mover
-A Minimalist python GUI to move file because Windows's one is annoying.
 
-
-
+````markdown
 # Ragilmalik’s Python GUI Mover 🗂️⚡
 
-A sleek, minimal, **modern** Tkinter app to safely move files from one folder to another (top-level only — **no subfolders**), with smart metadata checks, automatic renaming, and gorgeous Excel logs.
+A sleek, minimal, **modern** Tkinter app to safely move files from one folder to another (top-level or **recursive**), with **content-accurate duplicate detection (SHA-256)**, per-folder auto-renaming, long-path support on Windows, and gorgeous Excel logs.  
 Built for humans, not terminals. 😎
 
 ---
 
 ## ✨ Highlights
 
-* **No surprises, ever**: Compares **filename**, **filetype**, **filesize**, and **filedate** (mtime). If **all match**, it **skips**. Otherwise it **moves** safely.
-* **Zero overwrites**: If `file.jpg` exists with different metadata, the app renames to `file-1.jpg`, `file-2.jpg`, … until it finds a free name.
-* **Simulation Only** by default: See exactly what would happen **before** you run for real.
-* **Excel log (.xlsx)** with formatting:
-
-  * Columns: **Timestamp**, **Action**, **Source Folder**, **Destination Folder**, **Filename**, **New Filename**, **File Creation Time**, **Size**, **Note**
-  * **Timestamp format**: `DD/MM/YYYY HH:MM:SS`
-  * **File Creation Time** format: `DD/MM/YYYY HH:MM:SS`
-  * **Size** is rendered as text like `200KB`
-  * **Bold** header row and **bold** summary row
-  * 1 empty spacer row before the summary for neatness
-* **Choose where logs go**: Save the log to **Source**, **Destination**, or a **Custom** folder.
-* **Quality of life**:
-
-  * **Open Last Saved Log File** (opens with default OS app)
-  * **Clear Log Screen**
-  * **Clear Log & Delete Last Log File**
-* **Modern aesthetic**:
-
-  * **Dark theme by default** (pure black base) and **Light theme** (pure white base)
-  * Picker hover highlights switch to the **opposite** color (white on dark, black on light)
-  * **Distinct button colors** for quick recognition
-  * Subtle split-gradient header, clean typography, DPI awareness on Windows
-
----
-
-## 🧠 How it decides: Move vs Skip (no subfolders)
-
-1. Check if a same-named file already exists at the destination:
-
-   * **No existing file** → **Move** it.
-   * **Exists**:
-
-     * If metadata (name, extension, size, mtime) **all match** → **Skip**.
-     * Otherwise → **Move** and **auto-rename** to `name-1.ext`, `name-2.ext`, … (first free slot).
-2. Only processes files in the **top level** of the source folder (no recursion).
+- **True duplicate detection** (tiered & fast):  
+  1) If the destination name doesn’t exist → **Move**.  
+  2) If it exists and **sizes differ** → **Rename & move** (definitely different).  
+  3) If it exists and **sizes match** → compare **SHA-256** of both files.  
+     - **Hashes equal** → **Skip** (identical content).  
+     - **Hashes differ** → **Rename & move**.
+- **Recursive (preserve structure)**: Optional checkbox. Keeps the directory tree relative to the source.
+- **Skip hidden files/folders** (optional): Default is **off** (hidden are moved).
+- **File type filter**: Include-only (e.g. `jpg,png,mp4`). Leave empty = all files.
+- **Zero overwrites**: If `file.jpg` collides and differs, renames to `file-1.jpg`, `file-2.jpg`, … per **containing folder**.
+- **Long path support (Windows)**: Uses `\\?\` automatically under the hood for reliability.
+- **Simulation Only** by default: See exactly what would happen **before** you run for real.
+- **Excel log (.xlsx)** with formatting and clarity:
+  - Columns: **Timestamp**, **Action**, **Source Folder**, **Destination Folder**, **Filename**, **New Filename**, **File Creation Time**, **Size**, **Note**
+  - **Timestamp** & **File Creation Time** format: `DD/MM/YYYY HH:MM:SS`
+  - **Size** rendered as text like `200KB`
+  - **Bold** header row + **bold** summary row, with a spacer row for neatness
+  - **Always shows full destination path + filename** in the **Filename** column, formatted as `{Fullpath}/{Filename}` (forward slashes on all OS)
+  - **Destination Folder** column holds the **final destination directory** (absolute)
+- **Quality of life**:
+  - **Open Last Saved Log File** (opens with default OS app)
+  - **Clear Log Screen**
+  - **Clear Log & Delete Last Log File**
+  - **Pause / Resume / Stop** (safe)
+  - **Generate tollback script (Undo)** — builds a `.bat` (Windows) or `.sh` (macOS/Linux) from the last **Live** run
 
 ---
 
-## 📸 Screenshot
+## 🧠 How it decides: Move vs Skip
 
-<img width="1365" height="732" alt="Screenshot_1" src="https://github.com/user-attachments/assets/f8e8a401-d21b-4e6c-b797-c78334912fe9" />
+1. **No existing dest file** → **Move**.  
+2. **Existing dest file**:
+   - **Different size** → **Rename & move** (`name-1.ext`, `name-2.ext`, …).
+   - **Same size** → compute **SHA-256** for both:
+     - **Same hash** → **Skip** (identical content).
+     - **Different hash** → **Rename & move**.
+3. **Recursive mode** preserves **relative paths** under the destination.
+4. Renames are **per destination directory** (not global).
 
+---
+
+## 📸 Screens (optional)
+
+> 
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
-* **Python 3.8+**
-* Windows/macOS/Linux
-* One dependency: **openpyxl** (for Excel logs)
+- **Python 3.8+**
+- Windows/macOS/Linux
+- Dependency: **openpyxl** (for Excel logs)
 
 ```bash
 pip install openpyxl
-```
+````
 
 ### Run as a script
 
@@ -109,13 +106,13 @@ Each run creates a timestamped workbook like `SmartFileMover-log-YYYY-MM-DD_HH-M
 
 * **Timestamp** — `DD/MM/YYYY HH:MM:SS`
 * **Action** — `MOVED`, `MOVED_RENAMED`, `SKIP`, `DRYRUN_*`, `ERROR`, `INFO`, `SUMMARY`
-* **Source Folder**
-* **Destination Folder**
-* **Filename**
+* **Source Folder** — absolute path
+* **Destination Folder** — **absolute final directory** of the file
+* **Filename** — **absolute destination path including filename**, formatted `{Fullpath}/{Filename}`
 * **New Filename** — empty if not renamed
 * **File Creation Time** — `DD/MM/YYYY HH:MM:SS`
 * **Size** — e.g., `200KB`
-* **Note** — why it was moved/renamed/skipped
+* **Note** — e.g., “Different size; renamed”, “Identical content (SHA-256)”, etc.
 
 **Styling**
 
@@ -126,13 +123,17 @@ Each run creates a timestamped workbook like `SmartFileMover-log-YYYY-MM-DD_HH-M
 
 ## 🎛️ Controls & Options
 
-* **Source Folder / Destination Folder** — pick the top-level folders
-* **Log File Location (.xlsx)** — choose **Destination**, **Source**, or **Custom Folder**
-* **Simulation Only** — on by default; uncheck to perform real moves
-* **Run** — starts the job
-* **Clear Log Screen** — clears the on-screen log area only
-* **Clear Log & Delete Last Log File** — also deletes the last `.xlsx` produced this session
-* **Open Last Saved Log File** — opens the most recent `.xlsx` with your OS default app
+* **Source Folder / Destination Folder**
+* **Log File Location (.xlsx)** — **Destination**, **Source**, or **Custom Folder**
+* **Simulation Only** — default ON (safe)
+* **Recursive (preserve structure)** — default OFF
+* **Skip hidden files/folders** — default OFF
+* **File type filter** — include-only list like `jpg,png,mp4`
+* **Run**, **Pause**, **Resume**, **Stop**
+* **Clear Log Screen**
+* **Clear Log & Delete Last Log File**
+* **Open Last Saved Log File**
+* **Generate tollback script (Undo)**
 * **Theme** — Dark (pure black) / Light (pure white)
 
   * Picker hover highlights invert: white on dark, black on light
@@ -144,36 +145,41 @@ Each run creates a timestamped workbook like `SmartFileMover-log-YYYY-MM-DD_HH-M
 
 * **GUI**: Tkinter + ttk
 * **Logging**: openpyxl (`.xlsx`) with custom formats
-* **Platform behaviors**:
+* **Duplicate detection**: **SHA-256** hashing with 1MB chunks, used **only** when sizes match and names collide (with a **hash cache** to avoid recomputing).
+* **Windows**:
 
-  * **Open last log** uses `os.startfile` on Windows, `open` on macOS, `xdg-open` on Linux (with fallback to browser file URL)
-  * File creation time uses `os.path.getctime`. On Linux this may reflect “metadata change time” rather than true creation time.
+  * Long paths handled via `\\?\` internally.
+  * On-screen/Excel paths normalized to forward slashes for readability.
+* **Preserves timestamps**:
+
+  * Same-volume moves are renames (preserve times).
+  * Cross-volume moves fall back to copy2 + delete, preserving **mtime/atime**.
 
 ---
 
 ## ❓ FAQ
 
-**Q: Why doesn’t it scan subfolders?**
-A: Designed intentionally for speed and safety in top-level organization tasks. Keeping it flat prevents accidental deep moves. (If you want recursive mode later, see Roadmap 👇)
+**Does the log always show full paths?**
+Yes — both the on-screen log and the Excel **Filename** column show the **absolute destination path + filename** in `{Fullpath}/{Filename}` format.
 
-**Q: What happens if `file-1.jpg` already exists?**
-A: The app keeps counting: `file-2.jpg`, `file-3.jpg`, … until it finds the first free name.
+**Is hashing slow?**
+Hashing reads the whole file, so it’s used **only** when a destination name already exists **and sizes match**. The built-in **hash cache** minimizes re-hashing repeats.
 
-**Q: Can I trust “Simulation Only”?**
-A: Yes. It performs all checks and tells you exactly what **would** happen — but doesn’t touch your files.
+**What if `file-1.jpg` already exists?**
+The app keeps counting: `file-2.jpg`, `file-3.jpg`, … until it finds the first free name — **per destination directory**.
 
-**Q: Where’s the log saved?**
-A: Wherever you set (Source / Destination / Custom). You can open it instantly with the built-in button.
+**Can I trust “Simulation Only”?**
+Yes. It performs all checks (including SHA-256 where applicable) and reports exactly what **would** happen — without touching your files.
 
 ---
 
 ## 🗺️ Roadmap (ideas)
 
-* Optional **recursive** mode with safe guards
-* **Filters** (by extension/size/date)
-* **Batch presets** (save & re-run common moves)
-* Export **JSON**/CSV alongside Excel if needed
-* **Drag & drop** folders onto the window
+* Volume/depth caps & free-space preflight UI
+* Advanced exclusions and safe flatten mode
+* Batch presets
+* Export JSON manifest alongside Excel
+* Drag & drop folders onto the window
 
 ---
 
