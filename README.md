@@ -50,9 +50,10 @@ Built for humans, not terminals. 😎
 
 ---
 
-## 📸 Screens (optional)
+## 📸 Screenshot
 
-> 
+> <img width="1365" height="729" alt="Screenshot_1" src="https://github.com/user-attachments/assets/d1a17a78-a505-4fcb-a566-3670e65951d8" />
+
 
 ---
 
